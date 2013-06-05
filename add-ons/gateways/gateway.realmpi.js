@@ -8,7 +8,7 @@ $(document).bind('em_booking_gateway_add_realex_remote', function(event, respons
 			spForm.append('<input type="hidden" name="'+index+'" value="'+value+'" />');
 		});
 		spForm.append('<input id="em-realmpi-submit" type="submit" style="display:none" />');
-		spForm.insertAfter('#em-booking-form').trigger('submit');
+		spForm.appendTo('body').trigger('submit');
 	}
 	
 });
