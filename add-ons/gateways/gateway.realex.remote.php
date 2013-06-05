@@ -322,6 +322,8 @@ class EM_Gateway_Realex_Remote extends EM_Gateway {
 					$EM_Booking->set_status(0, false); //Set back to normal "pending"
 				}
 
+				do_action('em_payment_processed', $EM_Booking, $this);
+
 				// Redirect to default thanks message
 				$redirect = get_permalink(get_option("dbem_my_bookings_page")).'?thanks=1';
 				header('Location: '.$redirect);

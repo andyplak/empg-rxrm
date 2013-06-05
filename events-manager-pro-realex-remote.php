@@ -10,6 +10,8 @@ Author URI: http://www.andyplace.co.uk
 
 Change Log:
 
+1.3 	Bugfix - mail notifications not sent when RealMPI enabled
+
 1.2     Tooltip added for CVV number - 24/03/2013
 
 1.1 	Updated to work with EM PRO 2.3 with multiple bookings - 13/03/2013
