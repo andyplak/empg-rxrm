@@ -26,6 +26,7 @@ class EM_Gateway_Realex_Remote extends EM_Gateway {
 			add_action('em_handle_payment_return_' . $this->gateway, array(&$this, 'handle_payment_return')); // Handle 3D Secure return
 			add_action('em_template_my_bookings_header',array(&$this,'say_thanks')); //say thanks on my_bookings page
 			add_action('em_template_my_bookings_header',array(&$this,'pay_fail_message')); //display error message back to customer
+			add_action('em_cart_form_after_totals',array(&$this,'credit_card_surcharge_info')); //Display credit card surcharge info
 		}
 	}
 
@@ -476,6 +477,21 @@ Events Manager
 					break;
 			}
 			echo "</p></div>";
+		}
+	}
+
+	function credit_card_surcharge_info($EM_Multiple_Booking) {
+		$sc_pcnt = get_option('em_'. $this->gateway . "_cc_surcharge");
+
+		if( !is_null( $sc_pcnt ) && $sc_pcnt > 0 ) {
+			$surcharge_price = ( $sc_pcnt / 100 ) * $EM_Multiple_Booking->get_price();
+			$surcharge_total = $EM_Multiple_Booking->format_price( $EM_Multiple_Booking->get_price() + $surcharge_price );
+			?>
+			<tr>
+				<th colspan="2"><?php echo sprintf( __('Total Price paying by Credit Card (includes a %s&#37; surcharge)','em-pro'),get_option('em_'. $this->gateway . "_cc_surcharge") ); ?></th>
+				<td><?php echo $surcharge_total; ?></td>
+			</tr>
+			<?php
 		}
 	}
 
