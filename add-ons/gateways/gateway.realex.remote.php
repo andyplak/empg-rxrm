@@ -313,7 +313,7 @@ class EM_Gateway_Realex_Remote extends EM_Gateway {
 	        //Handle result
 	        if( $response['response']['result'] == '00' ){
 
-				$EM_Booking->booking_meta[$this->gateway] = array('txn_id'=>$response['response']['authcode'], 'amount' => $EM_Booking->get_price(false, false, true));
+						$EM_Booking->booking_meta[$this->gateway] = array('txn_id'=>$response['response']['authcode'], 'amount' => $amount / 100);
 		        $this->record_transaction($EM_Booking, $amount / 100, $currency, $timestamp, $response['response']['authcode'], 'Completed', $response['response']['message']);
 
 	        	//Set booking status, but no emails sent
@@ -492,15 +492,27 @@ Events Manager
 		$sc_pcnt = get_option('em_'. $this->gateway . "_cc_surcharge");
 
 		if( $sc_pcnt > 0 ) {
-			$surcharge_price = ( $sc_pcnt / 100 ) * $EM_Multiple_Booking->get_price();
-			$surcharge_total = $EM_Multiple_Booking->format_price( $EM_Multiple_Booking->get_price() + $surcharge_price );
 			?>
 			<tr>
 				<th colspan="2"><?php echo sprintf( __('Total Price paying by Credit Card (includes a %s&#37; surcharge)','em-pro'),get_option('em_'. $this->gateway . "_cc_surcharge") ); ?></th>
-				<td><?php echo $surcharge_total; ?></td>
+				<td><?php echo $EM_Multiple_Booking->format_price( $this->get_price_with_surcharge( $EM_Multiple_Booking ) ) ?></td>
 			</tr>
 			<?php
 		}
+	}
+
+	/**
+	 * Calculate the total booking price including surcharge
+	 * Note, this DOES NOT check if we should be applying it or not
+	 */
+	function get_price_with_surcharge( $EM_Booking ) {
+		$sc_pcnt = get_option('em_'. $this->gateway . "_cc_surcharge");
+
+		if( $sc_pcnt > 0 ) {
+			$surcharge_price = ( $sc_pcnt / 100 ) * $EM_Booking->get_price(false, false, true);
+			return $EM_Booking->get_price() + $surcharge_price;
+		}
+		return $EM_Booking->get_price(false, false, true);
 	}
 
 	function process_transaction($EM_Booking) {
@@ -562,11 +574,8 @@ Events Manager
 		}
 
 		// Do we need to apply a Credit Card surcharge?
-		$sc_pcnt = get_option('em_'. $this->gateway . "_cc_surcharge");
-
-		if( $sc_pcnt > 0 && $_REQUEST['x_card_type'] != 'SWITCH' ) {
-			$surcharge_price = ( $sc_pcnt / 100 ) * $EM_Booking->get_price(false, false, true);
-			$amount = $EM_Booking->get_price() + $surcharge_price;
+		if( $_REQUEST['x_card_type'] != 'SWITCH' ) {
+			$amount = $this->get_price_with_surcharge( $EM_Booking );
 		}else{
 			$amount = $EM_Booking->get_price(false, false, true);
 		}
@@ -763,7 +772,7 @@ Events Manager
 
         //Handle result
         if( $response['response']['result'] == '00' ){
-			$EM_Booking->booking_meta[$this->gateway] = array('txn_id'=>$response['response']['authcode'], 'amount' => $EM_Booking->get_price(false, false, true));
+			    $EM_Booking->booking_meta[$this->gateway] = array('txn_id'=>$response['response']['authcode'], 'amount' => $amount / 100);
 	        $this->record_transaction($EM_Booking, $amount / 100, $currency, date('Y-m-d H:i:s', current_time('timestamp')), $response['response']['authcode'], 'Completed', '');
 	        $result['status'] = true;
         }else{
