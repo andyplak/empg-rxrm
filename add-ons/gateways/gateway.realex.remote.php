@@ -484,6 +484,10 @@ Events Manager
 		}
 	}
 
+	/**
+	 * Hooks into cart / checkout display and shows surcharge information
+	 * @param EM_Multiple_booking $EM_Multiple_Booking
+	 */
 	function credit_card_surcharge_info($EM_Multiple_Booking) {
 		$sc_pcnt = get_option('em_'. $this->gateway . "_cc_surcharge");
 
@@ -498,7 +502,6 @@ Events Manager
 			<?php
 		}
 	}
-
 
 	function process_transaction($EM_Booking) {
 		global $EM_Notices;
@@ -558,16 +561,25 @@ Events Manager
 			return apply_filters('em_gateway_realex_process_transaction', $result, $EM_Booking, $this);
 		}
 
+		// Do we need to apply a Credit Card surcharge?
+		$sc_pcnt = get_option('em_'. $this->gateway . "_cc_surcharge");
+
+		if( $sc_pcnt > 0 && $_REQUEST['x_card_type'] != 'SWITCH' ) {
+			$surcharge_price = ( $sc_pcnt / 100 ) * $EM_Booking->get_price(false, false, true);
+			$amount = $EM_Booking->get_price() + $surcharge_price;
+		}else{
+			$amount = $EM_Booking->get_price(false, false, true);
+		}
 
 		// The amount should be in the smallest unit of the required currency (i.e. 2000 = £20, $20 or €20)
-        $amount     = $EM_Booking->get_price(false, false, true) * 100;
-        $currency   = get_option('dbem_bookings_currency', 'GBP');
-        $cardnumber = $_REQUEST['x_card_num'];
-        $cardname   = $_REQUEST['x_card_holder'];
-        $cardtype   = $_REQUEST['x_card_type'];
-        $expdate    = $_REQUEST['x_exp_date_month'].$_REQUEST['x_exp_date_year'];
-        $cardissue  = $_REQUEST['x_card_issue_num'];
-        $cardcode   = $_REQUEST['x_card_code'];
+    $amount     = $amount * 100;
+    $currency   = get_option('dbem_bookings_currency', 'GBP');
+    $cardnumber = $_REQUEST['x_card_num'];
+    $cardname   = $_REQUEST['x_card_holder'];
+    $cardtype   = $_REQUEST['x_card_type'];
+    $expdate    = $_REQUEST['x_exp_date_month'].$_REQUEST['x_exp_date_year'];
+    $cardissue  = $_REQUEST['x_card_issue_num'];
+    $cardcode   = $_REQUEST['x_card_code'];
 
 		$merchantid = get_option('em_'. $this->gateway . "_merchant_id" );
 		$secret     = get_option('em_'. $this->gateway . "_shared_secret" );
