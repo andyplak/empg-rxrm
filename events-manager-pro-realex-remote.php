@@ -3,12 +3,14 @@
 Plugin Name: Events Manager Pro - RealEx Remote Gateway
 Plugin URI: http://wp-events-plugin.com
 Description: RealEx Remote payment gateway pluging for Events Manager Pro
-Version: 1.3
+Version: 1.3.1
 Depends: Events Manager Pro
 Author: Andy Place
 Author URI: http://www.andyplace.co.uk
 
 Change Log:
+
+1.3.1 Credit Card Surcharge
 
 1.3 	Bugfix - mail notifications not sent when RealMPI enabled
 
