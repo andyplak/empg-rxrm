@@ -1000,12 +1000,19 @@ Events Manager
 			 	<th scope="row"><?php _e('Domain / Account', 'emp-pro') ?></th>
 			    <td><input type="text" name="account" value="<?php esc_attr_e(get_option( 'em_'. $this->gateway . "_account", "" )); ?>" /></td>
 			</tr>
+			<tr valign="top">
+			 	<th scope="row"><?php _e('Credit Card Surcharge', 'emp-pro') ?></th>
+			  <td>
+			  	<input type="number" name="cc_surcharge" value="<?php esc_attr_e(get_option( 'em_'. $this->gateway . "_cc_surcharge", "" )); ?>" />%<br />
+			  	<em><?php _e('If you wish to charge a surcharge for users paying by credit card, enter the percentage here.','em-pro'); ?></em><br />
+			  </td>
+			</tr>
 		  	<tr valign="top">
 			  <th scope="row"><?php _e('Use RealMPI 3D Secure', 'em-pro') ?></th>
 			  <td>
 			  	<input type="checkbox" name="realmpi" value="1" <?php echo (get_option('em_'. $this->gateway . "_realmpi" )) ? 'checked="checked"':''; ?> /><br />
 			  </td>
-		  	</tr>
+		  </tr>
 		  <tr valign="top">
 			  <th scope="row"><?php _e('Manually approve completed transactions?', 'em-pro') ?></th>
 			  <td>
@@ -1030,6 +1037,7 @@ Events Manager
 			$this->gateway . "_shared_secret" => $_REQUEST[ 'shared_secret' ],
 			$this->gateway . "_account" => $_REQUEST[ 'account' ],
 			$this->gateway . "_realmpi" => $_REQUEST[ 'realmpi' ],
+			$this->gateway . "_cc_surcharge" => $_REQUEST[ 'cc_surcharge' ],
 			$this->gateway . "_manual_approval" => $_REQUEST[ 'manual_approval' ],
 			$this->gateway . "_booking_feedback" => wp_kses_data($_REQUEST[ 'booking_feedback' ]),
 			$this->gateway . "_booking_feedback_free" => wp_kses_data($_REQUEST[ 'booking_feedback_free' ]),
