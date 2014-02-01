@@ -405,7 +405,11 @@ Events Manager
           	<option value="SWITCH">Switch</option>
           	<option value="VISA">Visa</option>
           </select>
-		<p>
+        </p>
+      <?php if( get_option('em_'. $this->gateway . "_cc_surcharge") > 0 ) : ?>
+        <p><em><?php echo sprintf( __('Please note: paying by Credit Card incurs a %s&#37; surcharge.','em-pro'),get_option('em_'. $this->gateway . "_cc_surcharge") ); ?></em></p>
+      <?php endif; ?>
+				<p>
           <label><?php  _e('Card Holder Name','em-pro'); ?></label>
           <input type="text" size="15" name="x_card_holder" value="" />
         </p>
