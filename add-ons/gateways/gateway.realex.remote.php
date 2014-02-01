@@ -487,7 +487,7 @@ Events Manager
 	function credit_card_surcharge_info($EM_Multiple_Booking) {
 		$sc_pcnt = get_option('em_'. $this->gateway . "_cc_surcharge");
 
-		if( !is_null( $sc_pcnt ) && $sc_pcnt > 0 ) {
+		if( $sc_pcnt > 0 ) {
 			$surcharge_price = ( $sc_pcnt / 100 ) * $EM_Multiple_Booking->get_price();
 			$surcharge_total = $EM_Multiple_Booking->format_price( $EM_Multiple_Booking->get_price() + $surcharge_price );
 			?>
