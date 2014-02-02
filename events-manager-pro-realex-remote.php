@@ -10,7 +10,8 @@ Author URI: http://www.andyplace.co.uk
 
 Change Log:
 
-1.3.1 Credit Card Surcharge
+1.3.1 - Credit Card Surcharge
+      - Bug fix. jquery error when not using RealMpi
 
 1.3 	Bugfix - mail notifications not sent when RealMPI enabled
 
