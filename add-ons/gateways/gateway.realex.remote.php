@@ -574,11 +574,13 @@ Events Manager
     }
 
     // Do we need to apply a Credit Card surcharge?
-    if( $_REQUEST['x_card_type'] != 'SWITCH' ) {
+    if( $this->is_credit_card( $_REQUEST['x_card_num'] ) ) {
       $amount = $this->get_price_with_surcharge( $EM_Booking );
     }else{
       $amount = $EM_Booking->get_price(false, false, true);
     }
+
+
 
     // The amount should be in the smallest unit of the required currency (i.e. 2000 = £20, $20 or €20)
     $amount     = $amount * 100;
@@ -970,6 +972,33 @@ Events Manager
     return ($sum % 10 == 0);
   }
 
+  /**
+   * Identify if card is credit or debit
+   * For credit card surcharge feature request, RealEx API doesn't differenciate beween
+   * credit or debit, so we need other means to detect this. In steps binlist.net
+   *
+   * @param $card_number
+   * @return boolean true for credit card
+   */
+  private function is_credit_card( $card_number ) {
+
+    // Lookup card details on binlist.net
+    $url = 'http://www.binlist.net/json/'.substr( $card_number, 0, 6 );
+    $result = @file_get_contents( $url );
+
+    // 404 means no match in binlist db
+    if( !$result ) {
+      // Have to assume debit and not charge surcharge
+      return false;
+    }
+
+    $result = json_decode( $result );
+    if( $result->card_type == 'CREDIT' ) {
+      return true;
+    }
+
+    return false;
+  }
 
   function void($EM_Booking){
     if( !empty($EM_Booking->booking_meta[$this->gateway]) ){
