@@ -509,7 +509,7 @@ Events Manager
     $sc_pcnt = get_option('em_'. $this->gateway . "_cc_surcharge");
 
     if( $sc_pcnt > 0 ) {
-      $surcharge_price = ( $sc_pcnt / 100 ) * $EM_Booking->get_price(false, false, true);
+      $surcharge_price = round( ( $sc_pcnt / 100 ) * $EM_Booking->get_price(false, false, true), 2);
       return $EM_Booking->get_price() + $surcharge_price;
     }
     return $EM_Booking->get_price(false, false, true);
