@@ -509,7 +509,9 @@ Events Manager
     $sc_pcnt = get_option('em_'. $this->gateway . "_cc_surcharge");
 
     if( $sc_pcnt > 0 ) {
-      $surcharge_price = ( $sc_pcnt / 100 ) * $EM_Booking->get_price(false, false, true);
+      $price = $EM_Booking->get_price(false, false, true);
+      $price += $this->get_booking_fee( $EM_Booking ); // Add the booking fee (TIC custom)
+      $surcharge_price = round( ( $sc_pcnt / 100 ) * $price, 2);
       return $EM_Booking->get_price() + $surcharge_price;
     }
     return $EM_Booking->get_price(false, false, true);
@@ -580,7 +582,8 @@ Events Manager
       $amount = $EM_Booking->get_price(false, false, true);
     }
 
-
+    // Add the booking fee (TIC custom)
+    $amount += $this->get_booking_fee( $EM_Booking );
 
     // The amount should be in the smallest unit of the required currency (i.e. 2000 = £20, $20 or €20)
     $amount     = $amount * 100;
@@ -997,6 +1000,25 @@ Events Manager
     }
 
     return false;
+  }
+
+  /**
+   * Custom booking fee addition for The Indigo Concept
+   * Checks event custom attribute to see if booking fee should be applied per ticket
+   * @param EM_Booking $EM_Booking
+   * @return booking fee
+   */
+  private function get_booking_fee( $EM_Booking ) {
+    $booking_fee = 0;
+    if( get_option('dbem_multiple_bookings') ) {
+      foreach($EM_Booking->get_bookings() as $EM_Booking) {
+        $current_booking_fee = get_post_meta($EM_Booking->get_event()->post_id, 'booking_fee', 'true') * $EM_Booking->get_spaces();
+        $booking_fee += $current_booking_fee;
+      }
+    }else{
+      $booking_fee = get_post_meta($EM_Booking->get_event()->post_id, 'booking_fee', 'true') * $EM_Booking->get_spaces();
+    }
+    return $booking_fee;
   }
 
   function void($EM_Booking){
