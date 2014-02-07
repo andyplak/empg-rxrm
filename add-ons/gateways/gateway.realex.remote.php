@@ -574,7 +574,7 @@ Events Manager
     }
 
     // Do we need to apply a Credit Card surcharge?
-    if( $this->is_credit_card( $_REQUEST['x_card_num'] ) ) {
+    if( get_option('em_'. $this->gateway . "_cc_surcharge") > 0 && $this->is_credit_card( $_REQUEST['x_card_num'] ) ) {
       $amount = $this->get_price_with_surcharge( $EM_Booking );
     }else{
       $amount = $EM_Booking->get_price(false, false, true);
@@ -981,7 +981,6 @@ Events Manager
    * @return boolean true for credit card
    */
   private function is_credit_card( $card_number ) {
-
     // Lookup card details on binlist.net
     $url = 'http://www.binlist.net/json/'.substr( $card_number, 0, 6 );
     $result = @file_get_contents( $url );
