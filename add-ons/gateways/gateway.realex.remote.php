@@ -508,13 +508,14 @@ Events Manager
   function get_price_with_surcharge( $EM_Booking ) {
     $sc_pcnt = get_option('em_'. $this->gateway . "_cc_surcharge");
 
+    $price = $EM_Booking->get_price(false, false, true);
+    $price += $this->get_booking_fee( $EM_Booking ); // Add the booking fee (TIC custom)
+
     if( $sc_pcnt > 0 ) {
-      $price = $EM_Booking->get_price(false, false, true);
-      $price += $this->get_booking_fee( $EM_Booking ); // Add the booking fee (TIC custom)
       $surcharge_price = round( ( $sc_pcnt / 100 ) * $price, 2);
-      return $EM_Booking->get_price() + $surcharge_price;
+      $price += $surcharge_price;
     }
-    return $EM_Booking->get_price(false, false, true);
+    return $price;
   }
 
   function process_transaction($EM_Booking) {
@@ -577,13 +578,13 @@ Events Manager
 
     // Do we need to apply a Credit Card surcharge?
     if( get_option('em_'. $this->gateway . "_cc_surcharge") > 0 && $this->is_credit_card( $_REQUEST['x_card_num'] ) ) {
-      $amount = $this->get_price_with_surcharge( $EM_Booking );
+      $amount = $this->get_price_with_surcharge( $EM_Booking ); // Booking fee added via this call (TIC custom)
     }else{
       $amount = $EM_Booking->get_price(false, false, true);
+      // Add the booking fee (TIC custom)
+      $amount += $this->get_booking_fee( $EM_Booking );
     }
 
-    // Add the booking fee (TIC custom)
-    $amount += $this->get_booking_fee( $EM_Booking );
 
     // The amount should be in the smallest unit of the required currency (i.e. 2000 = £20, $20 or €20)
     $amount     = $amount * 100;
