@@ -10,6 +10,8 @@ Author URI: http://www.andyplace.co.uk
 
 Change Log:
 
+1.4 and up, see GitHub
+
 1.3 	Bugfix - mail notifications not sent when RealMPI enabled
 
 1.2     Tooltip added for CVV number - 24/03/2013
@@ -21,6 +23,8 @@ Change Log:
 
 */
 
+include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+
 class EM_Pro_RealEx_Remote {
 
 	function EM_Pro_RealEx_Remote() {
@@ -30,8 +34,18 @@ class EM_Pro_RealEx_Remote {
 	}
 
 	function init() {
-		//add-ons
-		include('add-ons/gateways/gateway.realex.remote.php');
+		if( is_plugin_active('events-manager/events-manager.php') && is_plugin_active('events-manager-pro/events-manager-pro.php') ) {
+			//add-ons
+			include('add-ons/gateways/gateway.realex.remote.php');
+		}else{
+			add_action( 'admin_notices', array(&$this,'not_activated_error_notice') );
+		}
+	}
+
+	function not_activated_error_notice() {
+		$class = "error";
+		$message = __('Please ensure both Events Manager and Events Manager Pro are enabled for the RealEx Remote Gateway to work.', 'em-pro');
+		echo '<div class="'.$class.'"> <p>'.$message.'</p></div>';
 	}
 
 }
