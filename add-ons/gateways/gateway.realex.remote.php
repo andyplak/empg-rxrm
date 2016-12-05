@@ -172,7 +172,7 @@ class EM_Gateway_Realex_Remote extends EM_Gateway {
     $md = $_REQUEST['MD'];
 
     // Decrypt Merchant Data :
-    $md = rtrim( mcrypt_decrypt( MCRYPT_RIJNDAEL_256, md5( $secret ), base64_decode( $md ), MCRYPT_MODE_CBC, md5( md5( $secret ))), "\0");
+    $md = rtrim( mcrypt_decrypt( MCRYPT_RIJNDAEL_256, sha1( $secret ), base64_decode( $md ), MCRYPT_MODE_CBC, sha1( sha1( $secret ))), "\0");
 
     $valuearray = split("&",$md);
 
@@ -195,9 +195,9 @@ class EM_Gateway_Realex_Remote extends EM_Gateway {
 
     // creating the hash.
     $tmp = "$timestamp.$merchantid.$orderid.$amount.$currency.$cardnumber";
-    $md5hash = md5($tmp);
-    $tmp = "$md5hash.$secret";
-    $md5hash = md5($tmp);
+    $sha1hash = sha1($tmp);
+    $tmp = "$sha1hash.$secret";
+    $sha1hash = sha1($tmp);
 
     // Create 3ds-verifySig xml request
     $xml = "<request type='3ds-verifysig' timestamp='$timestamp'>
@@ -212,7 +212,7 @@ class EM_Gateway_Realex_Remote extends EM_Gateway {
     <chname>$cardname</chname>
   </card>
   <autosettle flag='1'/>
-  <md5hash>$md5hash</md5hash>
+  <sha1hash>$sha1hash</sha1hash>
     <pares>$pasres</pares>
 </request>";
 
@@ -275,11 +275,11 @@ class EM_Gateway_Realex_Remote extends EM_Gateway {
     $timestamp = strftime("%Y%m%d%H%M%S");
     mt_srand((double)microtime()*1000000);
 
-    // Rebuild the MD5 hash with updated timestamp
+    // Rebuild the SHA1 hash with updated timestamp
     $tmp = "$timestamp.$merchantid.$orderid.$amount.$currency.$cardnumber";
-    $md5hash = md5($tmp);
-    $tmp = "$md5hash.$secret";
-    $md5hash = md5($tmp);
+    $sha1hash = sha1($tmp);
+    $tmp = "$sha1hash.$secret";
+    $sha1hash = sha1($tmp);
 
     //A number of variables are needed to generate the request xml that is send to Realex Payments.
     $xml = "<request type='auth' timestamp='$timestamp'>
@@ -299,7 +299,7 @@ class EM_Gateway_Realex_Remote extends EM_Gateway {
     <xid>".$response['response']['threedsecure']['xid']."</xid>
     <eci>".$response['response']['threedsecure']['eci']."</eci>
   </mpi>
-  <md5hash>$md5hash</md5hash>
+  <sha1hash>$sha1hash</sha1hash>
   <comments>
     <comment id='1'>$comment1</comment>
     <comment id='2'>$comment2</comment>
@@ -607,12 +607,11 @@ Events Manager
     $comment2 = "Booking #".$EM_Booking->booking_id;
 
 
-// TODO: SHA1 is preferred to MD5 according to the docs
-    // This section of code creates the md5hash that is needed
+    // This section of code creates the sha1hash that is needed
     $tmp = "$timestamp.$merchantid.$orderid.$amount.$currency.$cardnumber";
-    $md5hash = md5($tmp);
-    $tmp = "$md5hash.$secret";
-    $md5hash = md5($tmp);
+    $sha1hash = sha1($tmp);
+    $tmp = "$sha1hash.$secret";
+    $sha1hash = sha1($tmp);
 
     // RealMPI Integration (3D Secure)
     if( get_option('em_'. $this->gateway . "_realmpi" ) ) {
@@ -635,7 +634,7 @@ Events Manager
     <chname>$cardname</chname>
   </card>
   <autosettle flag='1'/>
-  <md5hash>$md5hash</md5hash>
+  <sha1hash>$sha1hash</sha1hash>
 </request>";
 
         $response = $this->sendXmlRequest( $xml, "https://epage.payandshop.com/epage-3dsecure.cgi" );
@@ -652,7 +651,7 @@ Events Manager
             // Merchant Data
             $md ="orderid=$orderid&cardnumber=$cardnumber&cardname=$cardname&cardtype=$cardtype&currency=$currency&amount=$amount&expdate=$expdate";
             // encrypt
-            $md = base64_encode( mcrypt_encrypt( MCRYPT_RIJNDAEL_256, md5( $secret ), $md, MCRYPT_MODE_CBC, md5( md5( $secret ) ) ) );
+            $md = base64_encode( mcrypt_encrypt( MCRYPT_RIJNDAEL_256, sha1( $secret ), $md, MCRYPT_MODE_CBC, sha1( sha1( $secret ) ) ) );
 
             // Redirect to 3D secure via hidden form
             // Store RealMPI form data against booking for use in booking_form_feedback
@@ -756,7 +755,7 @@ Events Manager
     }
 
     $xml.= "
-  <md5hash>$md5hash</md5hash>
+  <sha1hash>$sha1hash</sha1hash>
   <comments>
     <comment id='1'>$comment1</comment>
     <comment id='2'>$comment2</comment>
